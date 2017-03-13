@@ -28,7 +28,7 @@
 #  Set Working directory
 
 
-setwd("C:/Felipe/OrganicTransitions_N2OROSE/CyclesSimulation/RoseRCodeScripts/NOA_SURFRAD_DATA") ; 
+setwd("C:/Felipe/OrganicTransitions_N2OROSE/CyclesSimulation/RoseRCodeScripts/NOAA_SURFRAD_R") ; 
 
 
 
