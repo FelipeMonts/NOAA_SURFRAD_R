@@ -1,4 +1,4 @@
-#
+st_HMTML_years<-getURLCo#
 #############################################################################################################################
 #
 #  Program to extract Weather Data from the SURFRAD Network weather station in Penn State, Pennsylvania
@@ -31,6 +31,47 @@
 setwd("C:/Felipe/OrganicTransitions_N2OROSE/CyclesSimulation/RoseRCodeScripts/NOAA_SURFRAD_R") ; 
 
 
+###############################################################################################################
+#                         Call packages neded to process the data 
+#                             
+###############################################################################################################
+
+
+library("RCurl") ;
+
+library("XML")   ;
+
+
+
+###############################################################################################################
+#                         Creating the loop to read each day of the year from the 
+#                             SURFRAD fttp archive
+###############################################################################################################
+
+
+
+##### read the list of years from the ftp #####
+
+PennStSurfrad.url<-"ftp://aftp.cmdl.noaa.gov/data/radiation/surfrad/Penn_State_PA/"   ;
+
+List_HMTML_years<-getURLContent(PennStSurfrad.url, ftp.use.epsv = FALSE, dirlistonly = TRUE)  ;
+
+List_years<-strsplit(List_HMTML_years,"\r*\n")[[1]]   ;
+
+List_years[List_years != "README"][1]
+
+
+##### read the list of daily files from the ftp #####
+
+List_HTML_files<-getURLContent(paste0(PennStSurfrad.url,List_years[1],"/"), ftp.use.epsv = FALSE, dirlistonly = TRUE)  ;
+
+
+List_files<-strsplit(List_HTML_files,"\r*\n")[[1]] ;
+
+length(List_files)
+
+
+
 
 
 
@@ -39,20 +80,16 @@ setwd("C:/Felipe/OrganicTransitions_N2OROSE/CyclesSimulation/RoseRCodeScripts/NO
 #                             SURFRAD fttp archive
 ###############################################################################################################
 
-## Create the URL's path for the directory to be added to the file
 
-PennStSurfrad.url<-"ftp://aftp.cmdl.noaa.gov/data/radiation/surfrad/Penn_State_PA/2016/"   ;
-
-FileName<-"psu16001.dat" ;  
 
 
 ### Read the station name, latitude, Long, elevation above sea levelpsu10001.data
 
-psu10001.station.name<-readLines(paste0(PennStSurfrad.url,FileName),n=1)  ;
+psu10001.station.name<-readLines(paste0(PennStSurfrad.url,List_years[1],"/",List_files[1]),n=1)  ;
 
-psu10001.station.data<-read.table(paste0(PennStSurfrad.url,FileName), skip= 1 ,nrows=1, header=F, as.is= T)  ;
+psu10001.station.data<-read.table(paste0(PennStSurfrad.url,List_years[1],"/",List_files[1]), skip= 1 ,nrows=1, header=F, as.is= T)  ;
 
-names(psu10001.station.data)<-c("LATITUDE", "LONGITUDE" , "ALTITUDE" , "meters","version" ,"version No") ;
+names(psu10001.station.data)<-c("LATITUDE", "LONGITUDE" , "ALTITUDE" , "meters","version" ,"version_No") ;
 
 
 
@@ -94,7 +131,7 @@ write.table(data.frame(YEAR, DOY , TX , TN , SOLAR , RHX , RHN , WIND)[F,] , fil
 #### Read one day of data .dat file from the SURFRAD URl 
 
 
-psu10001.data<-read.table(paste0(PennStSurfrad.url,FileName), skip=2, header=F, as.is= T)   ;
+psu10001.data<-read.table(paste0(PennStSurfrad.url,List_years[1],"/",List_files[1]), skip=2, header=F, as.is= T)   ;
 
 
 ##### Formatting the data according to the description on the README data file and adding column names
@@ -251,7 +288,10 @@ abline(h=WIND, col="RED",lwd=5)
 
 
 
-# Collect the data in a data frame and write it to the SurfradData.txt data file
+
+############################### Collect the data in a data frame and write it to the SurfradData.txt data file ############
+
+
 
 SurfradData<-data.frame(YEAR, DOY , TX , TN , SOLAR , RHX , RHN , WIND)  ;
 
@@ -259,6 +299,7 @@ SurfradData<-data.frame(YEAR, DOY , TX , TN , SOLAR , RHX , RHN , WIND)  ;
 SurfradData[,c("TX" , "TN" , "SOLAR" , "RHX" , "RHN" , "WIND")] <-signif(SurfradData[,c("TX" , "TN" , "SOLAR" , "RHX" , "RHN" , "WIND")],5)
 
 write.table(SurfradData , file="SurfradData.txt" , append=T , row.names = F, sep="\t", quote = F, col.names = F ) ;
+
 
 
 
