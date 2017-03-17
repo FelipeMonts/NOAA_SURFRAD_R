@@ -7,14 +7,14 @@
     "folds" : "",
     "hash" : "2298978598",
     "id" : "701B0724",
-    "lastKnownWriteTime" : 1489777040,
-    "last_content_update" : 1489777040236,
+    "lastKnownWriteTime" : 1489787930,
+    "last_content_update" : 1489787930600,
     "path" : "C:/Felipe/OrganicTransitions_N2OROSE/CyclesSimulation/RoseRCodeScripts/NOAA_SURFRAD_R/SURFRAD_Loop_R.R",
     "project_path" : "SURFRAD_Loop_R.R",
     "properties" : {
     },
     "relative_order" : 1,
-    "source_on_save" : false,
+    "source_on_save" : true,
     "source_window" : "",
     "type" : "r_source"
 }
