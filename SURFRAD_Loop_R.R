@@ -181,8 +181,8 @@ for (i in List_years[List_years != "README"])  {
      for (j in List_files)  {
           
 
-         # psuSRFRAD.data<-read.table(paste0(PennStSurfrad.url,i,"/",j), skip=2, header=F, as.is= T)   ;
-          psuSRFRAD.data<-read.table(paste0(PennStSurfrad.url,"2000","/","psu00180.dat"), skip=2, header=F, as.is= T)  
+          psuSRFRAD.data<-read.table(paste0(PennStSurfrad.url,i,"/",j), skip=2, header=F, as.is= T)   ;
+          # psuSRFRAD.data<-read.table(paste0(PennStSurfrad.url,"2000","/","psu00180.dat"), skip=2, header=F, as.is= T)  
 
        
           
@@ -233,6 +233,13 @@ for (i in List_years[List_years != "README"])  {
           
           TN<-psuSRFRAD.data[which.min(psuSRFRAD.data[psuSRFRAD.data$temp != -9999.9,"temp"]),"temp"] ;
           
+          
+          if (length (TX) == 0) TX<- -9999.9 ;
+          
+          if (length (TN) == 0) TN<- -9999.9 ;
+          
+          
+          
           # plot(psuSRFRAD.data$dt,psuSRFRAD.data$temp) ;
           # plot(psuSRFRAD.data[psuSRFRAD.data$temp != -9999.9,"dt"],psuSRFRAD.data[psuSRFRAD.data$temp != -9999.9,"temp"]);
           
@@ -266,6 +273,8 @@ for (i in List_years[List_years != "README"])  {
           SOLAR<-sum(direct_n) * 60 * (24*60/length(direct_n))  / 10^6 ;
           
           
+          if (length (SOLAR) == 0) SOLAR<- -9999.9   ;
+          
           
           
           
@@ -282,6 +291,10 @@ for (i in List_years[List_years != "README"])  {
           
           RHN<-psuSRFRAD.data[which.min(psuSRFRAD.data[psuSRFRAD.data$rh != -9999.9,"rh"]),"rh"] ;
           
+          
+          if (length (RHX) == 0) RHX<- -9999.9 ;
+          
+          if (length (RHN) == 0) RHN<- -9999.9 ;
           
           # plot(psuSRFRAD.data$dt,psuSRFRAD.data$rh) ;
           # plot(psuSRFRAD.data[psuSRFRAD.data$rh != -9999.9,"dt"],psuSRFRAD.data[psuSRFRAD.data$rh != -9999.9,"rh"]) ;
@@ -306,7 +319,7 @@ for (i in List_years[List_years != "README"])  {
           # abline(h=WIND, col="RED",lwd=5)
           
           
-          
+           if (length (WIND) == 0) WIND<- -9999.9 ;
           
           
           ############################### Collect the data in a data frame and write it to the SurfradData.txt data file ############
@@ -316,11 +329,13 @@ for (i in List_years[List_years != "README"])  {
           SurfradData<-data.frame(YEAR, DOY , TX , TN , SOLAR , RHX , RHN , WIND)  ;
           
           
-          SurfradData[,c("TX" , "TN" , "SOLAR" , "RHX" , "RHN" , "WIND")] <-signif(SurfradData[,c("TX" , "TN" , "SOLAR" , "RHX" , "RHN" , "WIND")],4)
+          SurfradData[,c("TX" , "TN" , "SOLAR" , "RHX" , "RHN" , "WIND")] <-signif(SurfradData[,c("TX" , "TN" , "SOLAR" , "RHX" , "RHN" , "WIND")],5)
           
           write.table(SurfradData , file="SurfradData.txt" , append=T , row.names = F, sep="\t", quote = F, col.names = F ) ;
           
-          rm(!ls() %in% c("j",))
+          remove.files<-ls()[!ls() %in% c("j", "i" ,"SurfRad.names","List_years","List_files", "PennStSurfrad.url")]
+          
+          rm(list=remove.files)
           
      }
  
@@ -330,11 +345,22 @@ for (i in List_years[List_years != "README"])  {
 
 rm(i)
 
+SURFRAD_DATA<-read.table("SurfradData.txt", skip=4, header=T, as.is=T) ;
+
+
+SURFRAD_DATA$DATE<-as.Date(paste0(as.character(SURFRAD_DATA$YEAR), ":" , as.character(SURFRAD_DATA$DOY)),  "%Y:%j") ;
+
+
+plot(SURFRAD_DATA$DATE, SURFRAD_DATA$TX,col="RED")  ;
+points(SURFRAD_DATA$DATE, SURFRAD_DATA$TN,col="BLUE")   ;
+
+plot(SURFRAD_DATA$DATE, SURFRAD_DATA$SOLAR,col="RED")  ;
+
+plot(SURFRAD_DATA$DATE, SURFRAD_DATA$WIND,col="BLUE")  ;
+
+plot(SURFRAD_DATA$DATE, SURFRAD_DATA$RHX,col="RED")  ;
+points(SURFRAD_DATA$DATE, SURFRAD_DATA$RHN,col="BLUE")   ;
 
 
 
-
-
-
-
-
+end()
