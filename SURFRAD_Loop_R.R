@@ -9,7 +9,11 @@
 ##############################################################################################################################
 
 
+############################### Record Time To start##########################################################
 
+
+
+TimeStart<-Sys.time()  ;
 
 
 
@@ -362,5 +366,9 @@ plot(SURFRAD_DATA$DATE, SURFRAD_DATA$RHX,col="RED")  ;
 points(SURFRAD_DATA$DATE, SURFRAD_DATA$RHN,col="BLUE")   ;
 
 
+TimeEnd<-Sys.time()    ;
 
-end()
+CPUTime<-TimeEnd-TimeStart    ;
+
+
+CPUTime
