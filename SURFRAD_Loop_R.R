@@ -115,7 +115,13 @@ TX = 987654321  ;
 
 TN = 987654321  ;
 
-SOLAR = 987654321  ; 
+dw_solar= 987654321  ;
+
+uw_solar= 987654321  ;
+
+direct_n= 987654321  ;
+     
+diffuse=	987654321  ;    
 
 RHX = 987654321  ;
 
@@ -124,9 +130,11 @@ RHN = 987654321  ;
 WIND = 987654321  ;
 
 
-write.table(data.frame(YEAR, DOY , TX , TN , SOLAR , RHX , RHN , WIND)[F,] , file="SurfradData.txt" , append=T , row.names = F, sep="\t", quote = F ) ;
 
 
+#write.table(data.frame(YEAR, DOY , TX , TN , SOLAR , RHX , RHN , WIND)[F,] , file="SurfradData.txt" , append=T , row.names = F, sep="\t", quote = F ) ;
+
+write.table(data.frame(YEAR, DOY , TX , TN , dw_solar, dw_solar_pos=dw_solar , uw_solar, uw_solar_pos=uw_solar , direct_n , direct_n_pos=direct_n , diffuse , diffuse_pos=diffuse, RHX , RHX_TN=RHX , RHN , RHN_TX=RHN , WIND)[F,] , file="SurfradData.txt" , append=T , row.names = F, sep="\t", quote = F ) ;
 
 
 ##### Formatting the data according to the description on the README data file and adding column names
@@ -253,14 +261,27 @@ for (i in List_years[List_years != "README"])  {
           ############################### Extract cummulative radiation direct-normal solar (Watts m^-2) ##################
           
           
-          # Extracting the missing data marked as -9999.9 
+          # Extracting only positive values
           
           
           
-          direct_n<-psuSRFRAD.data[psuSRFRAD.data$direct_n != -9999.9,"direct_n"] ;
+          direct_n_data<-psuSRFRAD.data[psuSRFRAD.data$direct_n != -9999.9, "direct_n"] ;
+          direct_n_data_pos<-psuSRFRAD.data[psuSRFRAD.data$direct_n >= 0, "direct_n"] ;
           
           
+          dw_solar_data<-psuSRFRAD.data[psuSRFRAD.data$dw_solar != -9999.9, "dw_solar"] ; 
+          dw_solar_data_pos<-psuSRFRAD.data[psuSRFRAD.data$dw_solar >= 0, "dw_solar"] ; 
           
+          uw_solar_data<-psuSRFRAD.data[psuSRFRAD.data$uw_solar != -9999.9, "uw_solar"] ; 
+          uw_solar_data_pos<-psuSRFRAD.data[psuSRFRAD.data$uw_solar >= 0, "uw_solar"] ; 
+          
+          
+          diffuse_data<-psuSRFRAD.data[psuSRFRAD.data$diffuse != -9999.9, "diffuse"] ; 
+          diffuse_data_pos<-psuSRFRAD.data[psuSRFRAD.data$diffuse >= 0, "diffuse"] ; 
+
+
+
+
           # plot(psuSRFRAD.data$dt,psuSRFRAD.data$direct_n) ;
           # 
           # plot(psuSRFRAD.data[psuSRFRAD.data$direct_n != -9999.9,"dt"],psuSRFRAD.data[psuSRFRAD.data$direct_n != -9999.9,"direct_n"]) ;
@@ -274,14 +295,38 @@ for (i in List_years[List_years != "README"])  {
           
           # [watt/m2  = Watt-sec/m2-sec = Joule/m2-sec] * [60sec/min*60min/hr*24hr/day]*[1 MJ /10^6 J]
           
-          SOLAR<-sum(direct_n) * 60 * (24*60/length(direct_n))  / 10^6 ;
+          direct_n<-sum(direct_n_data) * 60 * (24*60/length(direct_n_data))  / 10^6 ;
+          direct_n_pos<-sum(direct_n_data_pos) * 60 * (24*60/length(direct_n_data))  / 10^6 ;
           
           
-          if (length (SOLAR) == 0) SOLAR<- -9999.9   ;
+          dw_solar<-sum(dw_solar_data) * 60 * (24*60/length(dw_solar_data))  / 10^6 ;
+          dw_solar_pos<-sum(dw_solar_data_pos) * 60 * (24*60/length(dw_solar_data))  / 10^6 ;
+          
+          uw_solar<-sum(dw_solar_data) * 60 * (24*60/length(dw_solar_data))  / 10^6 ;
+          uw_solar_pos<-sum(uw_solar_data_pos) * 60 * (24*60/length(dw_solar_data))  / 10^6 ;
+          
+          diffuse<-sum(diffuse_data) * 60 * (24*60/length(diffuse_data))  / 10^6 ;
+          diffuse_pos<-sum(diffuse_data_pos) * 60 * (24*60/length(diffuse_data))  / 10^6 ;
           
           
+          if (length (direct_n) == 0) direct_n<- -9999.9   ;
+          
+          if (length (direct_n_pos) == 0) direct_n_pos<- -9999.9   ;
           
           
+          if (length (dw_solar) == 0) dw_solar<- -9999.9   ;
+          
+          if (length (dw_solar_pos) == 0) dw_solar_pos<- -9999.9   ;
+          
+          
+          if (length (uw_solar) == 0) uw_solar<- -9999.9   ;
+          
+          if (length (uw_solar_pos) == 0) uw_solar_pos<- -9999.9   ;
+          
+          
+          if (length (diffuse) == 0) diffuse<- -9999.9   ;
+          
+          if (length (uw_solar_pos) == 0) uw_solar_pos<- -9999.9   ;
           
           ###############################  Extract Minimum and maximum relative humidity ###########################################
           
@@ -293,12 +338,20 @@ for (i in List_years[List_years != "README"])  {
           
           RHX<-psuSRFRAD.data[which.max(psuSRFRAD.data[psuSRFRAD.data$rh != -9999.9,"rh"]),"rh"] ;
           
+          RHX_TN<-psuSRFRAD.data[which.min(psuSRFRAD.data[psuSRFRAD.data$temp != -9999.9,"temp"]),"rh"]  ;
+          
           RHN<-psuSRFRAD.data[which.min(psuSRFRAD.data[psuSRFRAD.data$rh != -9999.9,"rh"]),"rh"] ;
+          
+          RHN_TX<-psuSRFRAD.data[which.max(psuSRFRAD.data[psuSRFRAD.data$temp != -9999.9,"temp"]),"rh"] ;
           
           
           if (length (RHX) == 0) RHX<- -9999.9 ;
           
+          if (length (RHX_TN) == 0) RHX_TN<- -9999.9 ;
+          
           if (length (RHN) == 0) RHN<- -9999.9 ;
+          
+          if (length (RHN_TX) == 0) RHN_TX<- -9999.9 ;
           
           # plot(psuSRFRAD.data$dt,psuSRFRAD.data$rh) ;
           # plot(psuSRFRAD.data[psuSRFRAD.data$rh != -9999.9,"dt"],psuSRFRAD.data[psuSRFRAD.data$rh != -9999.9,"rh"]) ;
@@ -330,14 +383,15 @@ for (i in List_years[List_years != "README"])  {
           
           
           
-          SurfradData<-data.frame(YEAR, DOY , TX , TN , SOLAR , RHX , RHN , WIND)  ;
+          SurfradData<-data.frame(YEAR, DOY , TX , TN ,  dw_solar, dw_solar_pos , uw_solar, uw_solar_pos , direct_n , direct_n_pos , diffuse , diffuse_pos , RHX , RHX_TN , RHN , RHN_TX ,  WIND)  ;
           
           
-          SurfradData[,c("TX" , "TN" , "SOLAR" , "RHX" , "RHN" , "WIND")] <-signif(SurfradData[,c("TX" , "TN" , "SOLAR" , "RHX" , "RHN" , "WIND")],5)
+          
+          SurfradData[,c("TX" , "TN" , "dw_solar", "dw_solar_pos" , "uw_solar", "uw_solar_pos" , "direct_n" , "direct_n_pos" , "diffuse" , "diffuse_pos" , "RHX" , "RHX_TN" , "RHN" ,"RHN_TX" , "WIND")] <-signif(SurfradData[,c("TX" , "TN" , "dw_solar", "dw_solar_pos" , "uw_solar", "uw_solar_pos" , "direct_n" , "direct_n_pos" , "diffuse" , "diffuse_pos" , "RHX" , "RHX_TN" , "RHN" ,"RHN_TX" , "WIND")],5)
           
           write.table(SurfradData , file="SurfradData.txt" , append=T , row.names = F, sep="\t", quote = F, col.names = F ) ;
           
-          remove.files<-ls()[!ls() %in% c("j", "i" ,"SurfRad.names","List_years","List_files", "PennStSurfrad.url")]
+          remove.files<-ls()[!ls() %in% c("j", "i" ,"SurfRad.names","List_years","List_files", "PennStSurfrad.url","TimeStart")]
           
           rm(list=remove.files)
           
@@ -356,14 +410,22 @@ SURFRAD_DATA$DATE<-as.Date(paste0(as.character(SURFRAD_DATA$YEAR), ":" , as.char
 
 
 plot(SURFRAD_DATA$DATE, SURFRAD_DATA$TX,col="RED")  ;
+
+plot(SURFRAD_DATA$DATE, SURFRAD_DATA$TX,col="RED", ylim=c(0,45)) ;
 points(SURFRAD_DATA$DATE, SURFRAD_DATA$TN,col="BLUE")   ;
 
 plot(SURFRAD_DATA$DATE, SURFRAD_DATA$SOLAR,col="RED")  ;
+points(SURFRAD_DATA$DATE, SURFRAD_DATA$SOLAR_POS,col="BLUE")  ;
 
 plot(SURFRAD_DATA$DATE, SURFRAD_DATA$WIND,col="BLUE")  ;
 
 plot(SURFRAD_DATA$DATE, SURFRAD_DATA$RHX,col="RED")  ;
-points(SURFRAD_DATA$DATE, SURFRAD_DATA$RHN,col="BLUE")   ;
+plot(SURFRAD_DATA$DATE, SURFRAD_DATA$RHX,col="RED",ylim=c(0,120))  ;
+points(SURFRAD_DATA$DATE, SURFRAD_DATA$RHX_TN,col="BLUE")  ;
+
+plot(SURFRAD_DATA$DATE, SURFRAD_DATA$RHN,col="RED")   ;
+plot(SURFRAD_DATA$DATE, SURFRAD_DATA$RHN,col="RED",ylim=c(-10,100))   ;
+points(SURFRAD_DATA$DATE, SURFRAD_DATA$RHN_TX,col="BLUE")   ;
 
 
 TimeEnd<-Sys.time()    ;
